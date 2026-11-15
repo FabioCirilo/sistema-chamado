@@ -1,17 +1,20 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import logo from '../../assets/logo.png'
 import { Link } from 'react-router-dom'
+import { AuthContext } from '../../contexts/auth'
 
 export default function SignUp() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setpassword] = useState('')
 
-  function handleRegister(e) {
+  const { signUp, loadingAuth } = useContext(AuthContext)
+
+  async function handleSignUp(e) {
     e.preventDefault()
 
     if (name !== '' && email !== '' && password !== '') {
-      alert('Cadastrado com sucesso!')
+      await signUp(name, email, password)
     }
   }
 
@@ -30,7 +33,7 @@ export default function SignUp() {
           </p>
         </div>
 
-        <form onSubmit={handleRegister}>
+        <form onSubmit={handleSignUp}>
           <div className="input-group">
             <input
               type="text"
@@ -60,7 +63,9 @@ export default function SignUp() {
             />
           </div>
 
-          <button type="submit">Cadastrar</button>
+          <button type="submit">
+            {loadingAuth ? 'Carregando...' : 'Cadastrar'}
+          </button>
         </form>
 
         <div className="register-link">
