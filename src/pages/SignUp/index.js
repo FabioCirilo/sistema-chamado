@@ -9,7 +9,10 @@ export default function SignUp() {
 
   function handleRegister(e) {
     e.preventDefault()
-    alert('Teste')
+
+    if (name !== '' && email !== '' && password !== '') {
+      alert('Cadastrado com sucesso!')
+    }
   }
 
   return (

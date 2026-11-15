@@ -1,15 +1,20 @@
 import './signin.css'
 import logo from '../../assets/logo.png'
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
+import { AuthContext } from '../../contexts/auth'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
   const [password, setpassword] = useState('')
 
-  function handleLogin(e) {
+  const { signIn } = useContext(AuthContext)
+
+  function handleSignIn(e) {
     e.preventDefault()
-    alert('Teste')
+    if (email !== '' && password !== '') {
+      signIn(email, password)
+    }
   }
 
   return (
@@ -24,7 +29,7 @@ export default function SignIn() {
           <p>Entre com as suas credenciais para continuar.</p>
         </div>
 
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleSignIn}>
           <div className="input-group">
             <input
               type="email"
