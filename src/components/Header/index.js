@@ -34,7 +34,7 @@ export default function Header() {
         Perfil
       </Link>
 
-      <button className="btn-sair">
+      <button className="btn-sair" onClick={handleLogout}>
         <FiLogOut size={20} />
         Terminar Sessão
       </button>
