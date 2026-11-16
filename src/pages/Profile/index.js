@@ -7,10 +7,26 @@ import avatar from '../../assets/avatar.png'
 import './profile.css'
 
 export default function Profile() {
-  const { user } = useContext(AuthContext)
+  const { user, storageUser, setUser } = useContext(AuthContext)
   const [avatarUrl, setAvatarUrl] = useState(user && user.avatarUrl)
 
   const [name, setName] = useState(user?.name || '')
+  const [imageAvatar, setImageAvatar] = useState(null)
+
+  function handleFile(e) {
+    if (e.target.files[0]) {
+      const image = e.target.files[0]
+
+      if (image.type === 'image/jpeg' || image.type === 'image/png') {
+        setImageAvatar(image)
+        setAvatarUrl(URL.createObjectURL(image))
+      } else {
+        alert('Envia uma imagem do tipo jpeg ou png')
+        setImageAvatar(null)
+        return
+      }
+    }
+  }
 
   return (
     <>
@@ -25,7 +41,12 @@ export default function Profile() {
           <form className="form-profile">
             <div className="profile-photo">
               <div className="label-avatar">
-                <input type="file" accept="image/*" id="avatar" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="avatar"
+                  onChange={handleFile}
+                />
                 <label htmlFor="avatar" className="upload-icon">
                   <FiUpload color="#fff" size={22} />
                 </label>
@@ -49,7 +70,7 @@ export default function Profile() {
 
             <div className="form-fields">
               <div className="form-group">
-                <label>Nome completo</label>
+                <label>Nome</label>
                 <input
                   type="text"
                   value={name}
