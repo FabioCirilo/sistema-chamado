@@ -1,0 +1,172 @@
+.container {
+  width: calc(100% - 50px);
+  max-width: 850px;
+  margin: 30px auto;
+  padding: 35px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 15px;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.form-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Fotografia */
+.profile-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-photo span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.label-avatar {
+  width: 150px;
+  height: 150px;
+  position: relative;
+}
+
+.label-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #e0e7ff;
+  padding: 4px;
+}
+
+.label-avatar input {
+  display: none;
+}
+
+.upload-icon {
+  position: absolute;
+  right: 0;
+  bottom: 5px;
+  z-index: 2;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #4f46e5;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.upload-icon:hover {
+  background: #3730a3;
+  transform: scale(1.08);
+}
+
+/* Campos */
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.form-group label {
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.form-group input {
+  width: 100%;
+  height: 48px;
+  padding: 0 15px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+
+  outline: none;
+  background: #f8fafc;
+
+  color: #1e293b;
+  font-size: 14px;
+
+  transition: 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #4f46e5;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-group input:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* Botão salvar */
+.btn-save {
+  width: fit-content;
+  min-width: 180px;
+  height: 46px;
+  padding: 0 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  background: #4f46e5;
+  color: #ffffff;
+
+  border: none;
+  border-radius: 9px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-save:hover {
+  background: #3730a3;
+  transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .container {
+    width: calc(100% - 30px);
+    padding: 25px 18px;
+    margin: 20px auto;
+  }
+
+  .label-avatar {
+    width: 125px;
+    height: 125px;
+  }
+
+  .btn-save {
+    width: 100%;
+  }
+}
