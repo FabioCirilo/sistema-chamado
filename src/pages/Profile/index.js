@@ -62,6 +62,8 @@ export default function Profile() {
       .catch(err => {
         console.log('Erro ao enviar a imagem ' + err)
       })
+
+    return () => uploadTask
   }
 
   async function handleSubmit(e) {
