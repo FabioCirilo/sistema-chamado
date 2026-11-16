@@ -27,3 +27,18 @@ ul {
 button {
   cursor: pointer;
 }
+.content {
+  margin-left: 250px;
+  width: calc(100% - 250px);
+  min-height: 100vh;
+  background: #f8fafc;
+  transition: all 0.3s ease;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .content {
+    margin-left: 75px;
+    width: calc(100% - 75px);
+  }
+}

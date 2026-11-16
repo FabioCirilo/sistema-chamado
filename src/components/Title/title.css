@@ -1,0 +1,48 @@
+.title {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 20px 25px;
+  margin-bottom: 25px;
+
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.title svg {
+  color: #4f46e5;
+  flex-shrink: 0;
+}
+
+.title span {
+  color: #1e1b4b;
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.profile-container {
+  padding: 25px;
+}
+
+.profile-container h1 {
+  color: #1e293b;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .title {
+    padding: 16px 20px;
+  }
+
+  .title span {
+    font-size: 20px;
+  }
+
+  .profile-container {
+    padding: 18px;
+  }
+}
