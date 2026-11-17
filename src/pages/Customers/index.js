@@ -3,15 +3,34 @@ import Header from '../../components/Header'
 import Title from '../../components/Title'
 import { FiUser, FiSave } from 'react-icons/fi'
 import { useState } from 'react'
+import { addDoc, collection } from 'firebase/firestore'
+import { db } from '../../services/firebaseConnection'
+import { toast } from 'react-toastify'
 
 export default function Customers() {
   const [name, setName] = useState('')
   const [nif, setNif] = useState('')
   const [endereco, setEndereco] = useState('')
 
-  function handleRegister(e) {
+  async function handleRegister(e) {
     e.preventDefault()
-    alert('Teste')
+
+    if (name !== '' && nif !== '' && endereco !== '') {
+      await addDoc(collection(db, 'customers'), {
+        nameComplet: name,
+        nif: nif,
+        endereco: endereco
+      })
+        .then(() => {
+          toast.success('Empresa cadastrada com sucesso')
+          setName('')
+          setNif('')
+          setEndereco('')
+        })
+        .catch(err => {
+          console.log('Falha ao cadastrar cliente ' + err)
+        })
+    }
   }
 
   return (
@@ -34,9 +53,10 @@ export default function Customers() {
               <label>Nome do Cliente</label>
               <input
                 type="text"
-                placeholder="Digite o nome completo"
+                placeholder="Digite o nome da empresa"
                 value={name}
                 onChange={e => setName(e.target.value)}
+                required
               />
             </div>
 
@@ -47,6 +67,7 @@ export default function Customers() {
                 placeholder="Digite o NIF do cliente"
                 value={nif}
                 onChange={e => setNif(e.target.value)}
+                required
               />
             </div>
 
@@ -57,6 +78,7 @@ export default function Customers() {
                 placeholder="Digite o endereço completo"
                 value={endereco}
                 onChange={e => setEndereco(e.target.value)}
+                required
               />
             </div>
 
