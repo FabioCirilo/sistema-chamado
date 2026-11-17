@@ -7,6 +7,7 @@ import { AuthContext } from '../../contexts/auth'
 import { addDoc, collection, getDocs } from 'firebase/firestore'
 import { db } from '../../services/firebaseConnection'
 import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 
 const listRef = collection(db, 'customers')
 export default function New() {
@@ -19,6 +20,8 @@ export default function New() {
   const [complemento, setComplemento] = useState('')
   const [assunto, setAssunto] = useState('Suporte')
   const [status, setStatus] = useState('Aberto')
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function loadCustomers() {
@@ -87,6 +90,7 @@ export default function New() {
         setAssunto('Suporte')
         setStatus('Aberto')
         setCustomersSelected(0)
+        navigate('/dashboard')
       })
       .catch(err => {
         toast.error('Erro ao registrar')
