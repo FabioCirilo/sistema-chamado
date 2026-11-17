@@ -4,8 +4,9 @@ import Title from '../../components/Title'
 import './new.css'
 import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../contexts/auth'
-import { collection, getDocs } from 'firebase/firestore'
+import { addDoc, collection, getDocs } from 'firebase/firestore'
 import { db } from '../../services/firebaseConnection'
+import { toast } from 'react-toastify'
 
 const listRef = collection(db, 'customers')
 export default function New() {
@@ -66,6 +67,33 @@ export default function New() {
     setCustomersSelected(e.target.value)
   }
 
+  async function handleRegister(e) {
+    e.preventDefault()
+
+    console.log('Antes do doc')
+    //Registrar chamado
+    await addDoc(collection(db, 'chamados'), {
+      created: new Date(),
+      cliente: customers[customersSelected].nameComplet,
+      clienteId: customers[customersSelected].id,
+      assunto: assunto,
+      descricao: complemento,
+      status: status,
+      userId: user.uid
+    })
+      .then(() => {
+        toast.success('Chamado registrado!')
+        setComplemento('')
+        setAssunto('Suporte')
+        setStatus('Aberto')
+        setCustomersSelected(0)
+      })
+      .catch(err => {
+        toast.error('Erro ao registrar')
+        console.log(err)
+      })
+  }
+
   return (
     <>
       <Header />
@@ -81,7 +109,7 @@ export default function New() {
             <p>Preencha os dados abaixo para abrir um novo chamado.</p>
           </div>
 
-          <form className="new-form">
+          <form className="new-form" onSubmit={handleRegister}>
             <div className="form-group">
               <label>Cliente</label>
               {loadCustomer ? (
@@ -164,10 +192,6 @@ export default function New() {
             </div>
 
             <div className="form-actions">
-              <button type="reset" className="btn-cancel">
-                Limpar
-              </button>
-
               <button type="submit" className="btn-submit">
                 <FiPlusCircle size={18} />
                 Registrar chamado
