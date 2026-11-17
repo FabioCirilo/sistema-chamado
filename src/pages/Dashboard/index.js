@@ -4,10 +4,7 @@ import {
   FiClipboard,
   FiClock,
   FiCheckCircle,
-  FiAlertCircle,
-  FiEye,
-  FiEdit,
-  FiTrash2
+  FiAlertCircle
 } from 'react-icons/fi'
 
 import './dashboard.css'
