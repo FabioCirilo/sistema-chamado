@@ -2,17 +2,68 @@ import { FiPlusCircle } from 'react-icons/fi'
 import Header from '../../components/Header'
 import Title from '../../components/Title'
 import './new.css'
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { AuthContext } from '../../contexts/auth'
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '../../services/firebaseConnection'
 
+const listRef = collection(db, 'customers')
 export default function New() {
+  const { user } = useContext(AuthContext)
+
   const [customers, setCustomers] = useState([])
+  const [loadCustomer, setLoadCustomer] = useState(true)
+  const [customersSelected, setCustomersSelected] = useState(0)
 
   const [complemento, setComplemento] = useState('')
   const [assunto, setAssunto] = useState('Suporte')
   const [status, setStatus] = useState('Aberto')
 
+  useEffect(() => {
+    async function loadCustomers() {
+      const querySnapshot = getDocs(listRef)
+        .then(snapshot => {
+          let list = []
+
+          snapshot.forEach(doc => {
+            list.push({
+              id: doc.id,
+              nameComplet: doc.data().nameComplet
+            })
+          })
+
+          if (snapshot.docs.size === 0) {
+            console.log('Nenhuma empresa encontrada')
+            setCustomers([{ id: '1', nameComplet: 'Freela' }])
+            setLoadCustomer(false)
+            return
+          }
+
+          setCustomers(list)
+          setLoadCustomer(false)
+        })
+        .catch(err => {
+          console.log('Erro ao mostrar os clientes ' + err)
+          setLoadCustomer(false)
+          setCustomers([{ id: '1', nameComplet: 'Freela' }])
+        })
+
+      return querySnapshot
+    }
+
+    loadCustomers()
+  }, [])
+
   function handleOptionChange(e) {
     setStatus(e.target.value)
+  }
+
+  function handleChangeSelect(e) {
+    setAssunto(e.target.value)
+  }
+
+  function handleChangeCustomer(e) {
+    setCustomersSelected(e.target.value)
   }
 
   return (
@@ -33,21 +84,27 @@ export default function New() {
           <form className="new-form">
             <div className="form-group">
               <label>Cliente</label>
-              <select defaultValue="">
-                <option value="" disabled>
-                  Selecione um cliente
-                </option>
-                <option value="1">Mercado de teste</option>
-                <option value="2">Loja de informática</option>
-              </select>
+              {loadCustomer ? (
+                <input type="text" disabled={true} value="Carregando..." />
+              ) : (
+                <select
+                  value={customersSelected}
+                  onChange={handleChangeCustomer}
+                >
+                  {customers.map((item, index) => {
+                    return (
+                      <option key={index} value={index}>
+                        {item.nameComplet}
+                      </option>
+                    )
+                  })}
+                </select>
+              )}
             </div>
 
             <div className="form-group">
               <label>Assunto</label>
-              <select defaultValue={assunto}>
-                <option value="" disabled>
-                  Selecione o assunto
-                </option>
+              <select value={assunto} onChange={handleChangeSelect}>
                 <option value="Suporte">Suporte</option>
                 <option value="Visita Tecnica">Visita Técnica</option>
                 <option value="Financeiro">Financeiro</option>
