@@ -23,6 +23,7 @@ import {
   startAfter
 } from 'firebase/firestore'
 import { db } from '../../services/firebaseConnection'
+import Modal from '../../components/Modal'
 
 const listRef = collection(db, 'chamados')
 export default function Dashboard() {
@@ -32,6 +33,9 @@ export default function Dashboard() {
   const [isEmply, setIsEmply] = useState(false)
   const [lastDocs, setLastDocs] = useState()
   const [loadingMore, setLoadingMore] = useState(false)
+
+  const [modalOpen, setModalOpen] = useState(false)
+  const [chamadoSelecionado, setChamadoSelecionado] = useState(null)
 
   const emAndamento = chamados.filter(
     item => item.status === 'Progresso'
@@ -116,6 +120,11 @@ export default function Dashboard() {
         </main>
       </>
     )
+  }
+
+  function handleView(chamado) {
+    setChamadoSelecionado(chamado)
+    setModalOpen(true)
   }
 
   return (
@@ -265,7 +274,11 @@ export default function Dashboard() {
 
                         <td>
                           <div className="ticket-actions">
-                            <button title="Visualizar" className="btn-view">
+                            <button
+                              title="Visualizar"
+                              className="btn-view"
+                              onClick={() => handleView(item)}
+                            >
                               <FiEye size={18} />
                             </button>
 
@@ -294,6 +307,15 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      <Modal
+        isOpen={modalOpen}
+        chamado={chamadoSelecionado}
+        onClose={() => {
+          setModalOpen(false)
+          setChamadoSelecionado(null)
+        }}
+      />
     </>
   )
 }
