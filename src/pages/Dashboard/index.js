@@ -164,7 +164,7 @@ export default function Dashboard() {
 
             <div className="stat-card">
               <div className="stat-icon red">
-                <FiAlertCircle size={23} />
+                <FiEye size={23} />
               </div>
               <div>
                 <span>Aberto</span>

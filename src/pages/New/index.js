@@ -2,7 +2,7 @@ import { FiPlusCircle } from 'react-icons/fi'
 import Header from '../../components/Header'
 import Title from '../../components/Title'
 import './new.css'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../contexts/auth'
 import {
   addDoc,
@@ -31,6 +31,29 @@ export default function New() {
   const [status, setStatus] = useState('Aberto')
 
   const navigate = useNavigate()
+
+  const loadId = useCallback(
+    async list => {
+      try {
+        const docRef = doc(db, 'chamados', id)
+        const snapshot = await getDoc(docRef)
+
+        setAssunto(snapshot.data().assunto)
+        setStatus(snapshot.data().status)
+        setComplemento(snapshot.data().descricao)
+
+        const index = list.findIndex(
+          item => item.id === snapshot.data().clienteId
+        )
+        setCustomersSelected(index)
+        setIdCustomer(true)
+      } catch (err) {
+        console.log(err)
+        setIdCustomer(false)
+      }
+    },
+    [id]
+  )
 
   useEffect(() => {
     async function loadCustomers() {
@@ -69,27 +92,7 @@ export default function New() {
     }
 
     loadCustomers()
-  }, [id])
-
-  async function loadId(list) {
-    const docRef = doc(db, 'chamados', id)
-    await getDoc(docRef)
-      .then(snapshot => {
-        setAssunto(snapshot.data().assunto)
-        setStatus(snapshot.data().status)
-        setComplemento(snapshot.data().descricao)
-
-        let index = list.findIndex(
-          item => item.id === snapshot.data().clienteId
-        )
-        setCustomersSelected(index)
-        setIdCustomer(true)
-      })
-      .catch(err => {
-        console.log(err)
-        setIdCustomer(false)
-      })
-  }
+  }, [id, loadId])
 
   function handleOptionChange(e) {
     setStatus(e.target.value)
