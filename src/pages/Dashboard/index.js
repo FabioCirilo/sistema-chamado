@@ -14,14 +14,24 @@ import Header from '../../components/Header'
 import Title from '../../components/Title'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore'
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  startAfter
+} from 'firebase/firestore'
 import { db } from '../../services/firebaseConnection'
 
 const listRef = collection(db, 'chamados')
 export default function Dashboard() {
   const [chamados, setChamados] = useState([])
   const [loading, setLoading] = useState(true)
+
   const [isEmply, setIsEmply] = useState(false)
+  const [lastDocs, setLastDocs] = useState()
+  const [loadingMore, setLoadingMore] = useState(false)
 
   const emAndamento = chamados.filter(
     item => item.status === 'Progresso'
@@ -67,10 +77,28 @@ export default function Dashboard() {
         })
       })
 
+      const lastDoc = querySnopshot.docs[querySnopshot.docs.length - 1]
+
       setChamados(chamados => [...chamados, ...list])
+      setLastDocs(lastDoc)
     } else {
       setIsEmply(true)
     }
+
+    setLoadingMore(false)
+  }
+
+  async function handleMore() {
+    setLoadingMore(true)
+
+    const q = query(
+      listRef,
+      orderBy('created', 'desc'),
+      startAfter(lastDocs),
+      limit(5)
+    )
+    const querySnopshot = await getDocs(q)
+    await updateState(querySnopshot)
   }
 
   if (loading) {
@@ -251,6 +279,13 @@ export default function Dashboard() {
                   )}
                 </tbody>
               </table>
+              {!loadingMore && !isEmply && (
+                <div className="load-more-container">
+                  <button className="btn-load-more" onClick={handleMore}>
+                    Carregar mais chamados
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
