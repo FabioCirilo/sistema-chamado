@@ -4,15 +4,92 @@ import {
   FiClipboard,
   FiClock,
   FiCheckCircle,
-  FiAlertCircle
+  FiAlertCircle,
+  FiEye,
+  FiEdit
 } from 'react-icons/fi'
 
 import './dashboard.css'
 import Header from '../../components/Header'
 import Title from '../../components/Title'
 import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore'
+import { db } from '../../services/firebaseConnection'
 
+const listRef = collection(db, 'chamados')
 export default function Dashboard() {
+  const [chamados, setChamados] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [isEmply, setIsEmply] = useState(false)
+
+  const emAndamento = chamados.filter(
+    item => item.status === 'Progresso'
+  ).length
+
+  const concluidos = chamados.filter(item => item.status === 'Fechado').length
+
+  const aberto = chamados.filter(item => item.status === 'Aberto').length
+
+  useEffect(() => {
+    async function loadChamados() {
+      const q = query(listRef, orderBy('created', 'desc'), limit(5))
+
+      const querySnopshot = await getDocs(q)
+
+      setChamados([])
+
+      await updateState(querySnopshot)
+
+      setLoading(false)
+    }
+
+    loadChamados()
+
+    return () => {}
+  }, [])
+
+  async function updateState(querySnopshot) {
+    const isCollectionEmply = querySnopshot.length === 0
+
+    if (!isCollectionEmply) {
+      let list = []
+
+      querySnopshot.forEach(doc => {
+        list.push({
+          id: doc.id,
+          assunto: doc.data().assunto,
+          cliente: doc.data().cliente,
+          clienteId: doc.data().clienteId,
+          created: doc.data().created,
+          status: doc.data().status,
+          descricao: doc.data().descricao
+        })
+      })
+
+      setChamados(chamados => [...chamados, ...list])
+    } else {
+      setIsEmply(true)
+    }
+  }
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+
+        <main className="content">
+          <div className="loading-container">
+            <div className="loader"></div>
+
+            <h3>A carregar chamados...</h3>
+            <p>Estamos a preparar as informações para ti.</p>
+          </div>
+        </main>
+      </>
+    )
+  }
+
   return (
     <>
       <Header />
@@ -44,17 +121,26 @@ export default function Dashboard() {
               </div>
               <div>
                 <span>Total de chamados</span>
-                <h3>0</h3>
+                <h3>{chamados.length}</h3>
               </div>
             </div>
 
+            <div className="stat-card">
+              <div className="stat-icon red">
+                <FiAlertCircle size={23} />
+              </div>
+              <div>
+                <span>Aberto</span>
+                <h3>{aberto}</h3>
+              </div>
+            </div>
             <div className="stat-card">
               <div className="stat-icon orange">
                 <FiClock size={23} />
               </div>
               <div>
                 <span>Em andamento</span>
-                <h3>0</h3>
+                <h3>{emAndamento}</h3>
               </div>
             </div>
 
@@ -64,17 +150,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <span>Concluídos</span>
-                <h3>0</h3>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon red">
-                <FiAlertCircle size={23} />
-              </div>
-              <div>
-                <span>Pendentes</span>
-                <h3>0</h3>
+                <h3>{concluidos}</h3>
               </div>
             </div>
           </div>
@@ -87,7 +163,10 @@ export default function Dashboard() {
                 <p>Consulte e acompanhe os chamados registados.</p>
               </div>
 
-              <span className="tickets-count">0 chamados</span>
+              <span className="tickets-count">
+                {' '}
+                {chamados.length} chamados{' '}
+              </span>
             </div>
 
             <div className="table-responsive">
@@ -103,25 +182,73 @@ export default function Dashboard() {
                 </thead>
 
                 <tbody>
-                  {/* Os chamados do Firestore serão apresentados aqui */}
+                  {chamados.length === 0 ? (
+                    <tr>
+                      <td colSpan="5">
+                        <div className="empty-tickets">
+                          <FiMessageCircle size={42} />
+                          <h3>Nenhum chamado encontrado</h3>
+                          <p>
+                            Ainda não existem chamados registados. Crie um novo
+                            chamado para começar.
+                          </p>
 
-                  <tr>
-                    <td colSpan="5">
-                      <div className="empty-tickets">
-                        <FiMessageCircle size={42} />
-                        <h3>Nenhum chamado encontrado</h3>
-                        <p>
-                          Ainda não existem chamados registados. Crie um novo
-                          chamado para começar.
-                        </p>
+                          <Link to="/new" className="btn-empty">
+                            <FiPlus size={18} />
+                            Criar primeiro chamado
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    chamados.map(item => (
+                      <tr key={item.id}>
+                        <td>
+                          <strong>{item.cliente}</strong>
+                        </td>
 
-                        <Link to="/new" className="btn-empty">
-                          <FiPlus size={18} />
-                          Criar primeiro chamado
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
+                        <td>{item.assunto}</td>
+
+                        <td>
+                          <span
+                            className={`status-badge ${
+                              item.status === 'Aberto'
+                                ? 'status-pending'
+                                : item.status === 'Progresso'
+                                  ? 'status-progress'
+                                  : 'status-completed'
+                            }`}
+                          >
+                            {item.status === 'Aberto'
+                              ? 'Em aberto'
+                              : item.status === 'Progresso'
+                                ? 'Em progresso'
+                                : 'Fechado'}
+                          </span>
+                        </td>
+
+                        <td>
+                          {item.created?.toDate
+                            ? item.created.toDate().toLocaleDateString('pt-PT')
+                            : new Date(item.created).toLocaleDateString(
+                                'pt-PT'
+                              )}
+                        </td>
+
+                        <td>
+                          <div className="ticket-actions">
+                            <button title="Visualizar" className="btn-view">
+                              <FiEye size={18} />
+                            </button>
+
+                            <button title="Editar" className="btn-edit">
+                              <FiEdit size={18} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
