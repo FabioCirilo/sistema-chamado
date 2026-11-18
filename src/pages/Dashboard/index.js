@@ -4,7 +4,6 @@ import {
   FiClipboard,
   FiClock,
   FiCheckCircle,
-  FiAlertCircle,
   FiEye,
   FiEdit
 } from 'react-icons/fi'
