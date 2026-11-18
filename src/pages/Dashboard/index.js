@@ -269,9 +269,13 @@ export default function Dashboard() {
                               <FiEye size={18} />
                             </button>
 
-                            <button title="Editar" className="btn-edit">
+                            <Link
+                              to={`/new/${item.id}`}
+                              title="Editar"
+                              className="btn-edit"
+                            >
                               <FiEdit size={18} />
-                            </button>
+                            </Link>
                           </div>
                         </td>
                       </tr>
