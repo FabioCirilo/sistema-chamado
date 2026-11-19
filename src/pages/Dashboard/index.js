@@ -5,7 +5,8 @@ import {
   FiClock,
   FiCheckCircle,
   FiEye,
-  FiEdit
+  FiEdit,
+  FiTrash
 } from 'react-icons/fi'
 
 import './dashboard.css'
@@ -15,6 +16,8 @@ import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import {
   collection,
+  deleteDoc,
+  doc,
   getDocs,
   limit,
   orderBy,
@@ -23,6 +26,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '../../services/firebaseConnection'
 import Modal from '../../components/Modal'
+import { toast } from 'react-toastify'
 
 const listRef = collection(db, 'chamados')
 export default function Dashboard() {
@@ -104,6 +108,24 @@ export default function Dashboard() {
     await updateState(querySnopshot)
   }
 
+  function handleView(chamado) {
+    setChamadoSelecionado(chamado)
+    setModalOpen(true)
+  }
+
+  async function handleDelete(id) {
+    const docRef = doc(db, 'chamados', id)
+
+    await deleteDoc(docRef)
+      .then(() => {
+        toast.success('Chamado eliminado com sucesso')
+        setChamados(prev => prev.filter(item => item.id !== id))
+      })
+      .catch(err => {
+        console.log('Erro ao eliminar chamado ' + err)
+      })
+  }
+
   if (loading) {
     return (
       <>
@@ -119,11 +141,6 @@ export default function Dashboard() {
         </main>
       </>
     )
-  }
-
-  function handleView(chamado) {
-    setChamadoSelecionado(chamado)
-    setModalOpen(true)
   }
 
   return (
@@ -288,6 +305,13 @@ export default function Dashboard() {
                             >
                               <FiEdit size={18} />
                             </Link>
+                            <button
+                              title="Eliminar chamado"
+                              className="btn-delete"
+                              onClick={() => handleDelete(item.id)}
+                            >
+                              <FiTrash size={18} />
+                            </button>
                           </div>
                         </td>
                       </tr>
